@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { registerUser, loginUser } from "../services/auth.service";
+import { AuthRequest } from "../middleware/auth.middleware";
 
 export async function register(req: Request, res: Response) {
   try {
@@ -35,4 +36,11 @@ export async function login(req: Request, res: Response) {
       message: error instanceof Error ? error.message : "Something went wrong",
     });
   }
+}
+
+export async function me(req: AuthRequest, res: Response) {
+  res.json({
+    success: true,
+    user: req.user,
+  });
 }

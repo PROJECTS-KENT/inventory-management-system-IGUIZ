@@ -14,3 +14,7 @@ export function generateToken(userId: string, role: string) {
     }
   );
 }
+
+export function verifyToken(token: string) {
+  return jwt.verify(token, JWT_SECRET);
+}
