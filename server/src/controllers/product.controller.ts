@@ -18,23 +18,41 @@ export async function create(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error ? error.message : "Failed to create product",
     });
   }
 }
 
 export async function getAll(req: Request, res: Response) {
   try {
-    const products = await getProducts();
+    const search = req.query.search as string | undefined;
+
+    const category = req.query.category as string | undefined;
+
+    const supplier = req.query.supplier as string | undefined;
+
+    const page = Number(req.query.page) || 1;
+
+    const limit = Number(req.query.limit) || 10;
+
+    const result = await getProducts(
+      search,
+      category,
+      supplier,
+      page,
+      limit
+    );
 
     res.json({
       success: true,
-      products,
+      ...result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch products",
+      message:
+        error instanceof Error ? error.message : "Failed to fetch products",
     });
   }
 }
@@ -57,7 +75,8 @@ export async function getOne(req: Request, res: Response) {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch product",
+      message:
+        error instanceof Error ? error.message : "Failed to fetch product",
     });
   }
 }
@@ -73,7 +92,8 @@ export async function update(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error ? error.message : "Failed to update product",
     });
   }
 }
@@ -89,7 +109,8 @@ export async function remove(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error ? error.message : "Failed to delete product",
     });
   }
 }

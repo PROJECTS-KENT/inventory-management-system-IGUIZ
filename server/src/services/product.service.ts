@@ -18,16 +18,69 @@ export async function createProduct(data: {
   });
 }
 
-export async function getProducts() {
-  return prisma.product.findMany({
+export async function getProducts(
+  search?: string,
+  category?: string,
+  supplier?: string,
+  page: number = 1,
+  limit: number = 10
+) {
+  const skip = (page - 1) * limit;
+
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        sku: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  if (category) {
+    where.category = {
+      name: category,
+    };
+  }
+
+  if (supplier) {
+    where.supplier = {
+      name: supplier,
+    };
+  }
+
+  const products = await prisma.product.findMany({
+    where,
     include: {
       category: true,
       supplier: true,
     },
+    skip,
+    take: limit,
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  const total = await prisma.product.count({
+    where,
+  });
+
+  return {
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    products,
+  };
 }
 
 export async function getProductById(id: string) {
