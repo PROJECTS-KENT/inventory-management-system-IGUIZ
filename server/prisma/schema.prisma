@@ -12,6 +12,11 @@ enum Role {
   STAFF
 }
 
+enum TransactionType {
+  IN
+  OUT
+}
+
 model User {
   id       String  @id @default(cuid())
   name     String
@@ -62,6 +67,24 @@ model Product {
   category Category @relation(fields: [categoryId], references: [id])
   supplier Supplier @relation(fields: [supplierId], references: [id])
 
+  transactions InventoryTransaction[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model InventoryTransaction {
+  id        String @id @default(cuid())
+
+  type      TransactionType
+
+  quantity  Int
+
+  remarks   String?
+
+  productId String
+
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
 }
