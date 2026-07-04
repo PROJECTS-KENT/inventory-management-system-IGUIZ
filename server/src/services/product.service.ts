@@ -120,3 +120,20 @@ export async function deleteProduct(id: string) {
     where: { id },
   });
 }
+
+export async function getLowStockProducts(limit: number = 5) {
+  return prisma.product.findMany({
+    where: {
+      quantity: {
+        lte: limit,
+      },
+    },
+    include: {
+      category: true,
+      supplier: true,
+    },
+    orderBy: {
+      quantity: "asc",
+    },
+  });
+}

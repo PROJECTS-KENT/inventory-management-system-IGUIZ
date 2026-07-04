@@ -5,15 +5,22 @@ import {
   getOne,
   update,
   remove,
+  lowStock,
 } from "../controllers/product.controller";
 import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
 router.post("/", authenticate, create);
+
 router.get("/", authenticate, getAll);
+
+router.get("/low-stock", authenticate, lowStock);
+
 router.get("/:id", authenticate, getOne);
+
 router.put("/:id", authenticate, update);
+
 router.delete("/:id", authenticate, remove);
 
 export default router;

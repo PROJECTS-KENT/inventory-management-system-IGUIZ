@@ -5,6 +5,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  getLowStockProducts,
 } from "../services/product.service";
 
 export async function create(req: Request, res: Response) {
@@ -111,6 +112,27 @@ export async function remove(req: Request, res: Response) {
       success: false,
       message:
         error instanceof Error ? error.message : "Failed to delete product",
+    });
+  }
+}
+
+export async function lowStock(req: Request, res: Response) {
+  try {
+    const limit = Number(req.query.limit) || 5;
+
+    const products = await getLowStockProducts(limit);
+
+    res.json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch low stock products",
     });
   }
 }
