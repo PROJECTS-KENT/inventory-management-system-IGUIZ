@@ -27,16 +27,17 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://inventory-management-system-iguiz.vercel.app",
   process.env.CLIENT_URL,
 ].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header, such as health checks.
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error(`CORS blocked origin: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
