@@ -1,4 +1,6 @@
+
 import { Request, Response } from "express";
+
 import {
   createCategory,
   getCategories,
@@ -45,11 +47,18 @@ export async function list(req: Request, res: Response) {
 }
 
 export async function update(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid category ID",
+    });
+    return;
+  }
+
   try {
-    const category = await updateCategory(
-      req.params.id,
-      req.body.name
-    );
+    const category = await updateCategory(id, req.body.name);
 
     res.json({
       success: true,
@@ -67,8 +76,18 @@ export async function update(req: Request, res: Response) {
 }
 
 export async function remove(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid category ID",
+    });
+    return;
+  }
+
   try {
-    await deleteCategory(req.params.id);
+    await deleteCategory(id);
 
     res.json({
       success: true,

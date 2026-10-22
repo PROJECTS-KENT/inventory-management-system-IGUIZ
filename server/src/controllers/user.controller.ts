@@ -1,5 +1,6 @@
 
 import { Request, Response } from "express";
+
 import {
   getUsers,
   createUser,
@@ -34,14 +35,26 @@ export async function create(req: Request, res: Response) {
     res.status(400).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to create user",
+        error instanceof Error
+          ? error.message
+          : "Failed to create user",
     });
   }
 }
 
 export async function toggleStatus(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid user ID",
+    });
+    return;
+  }
+
   try {
-    const user = await toggleUserStatus(req.params.id);
+    const user = await toggleUserStatus(id);
 
     res.json({
       success: true,
@@ -51,7 +64,9 @@ export async function toggleStatus(req: Request, res: Response) {
     res.status(400).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to update user",
+        error instanceof Error
+          ? error.message
+          : "Failed to update user",
     });
   }
 }

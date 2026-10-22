@@ -1,4 +1,6 @@
+
 import { Request, Response } from "express";
+
 import {
   createSupplier,
   getSuppliers,
@@ -52,11 +54,18 @@ export async function getAll(req: Request, res: Response) {
 }
 
 export async function update(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid supplier ID",
+    });
+    return;
+  }
+
   try {
-    const supplier = await updateSupplier(
-      req.params.id,
-      req.body
-    );
+    const supplier = await updateSupplier(id, req.body);
 
     res.json({
       success: true,
@@ -74,8 +83,18 @@ export async function update(req: Request, res: Response) {
 }
 
 export async function remove(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid supplier ID",
+    });
+    return;
+  }
+
   try {
-    await deleteSupplier(req.params.id);
+    await deleteSupplier(id);
 
     res.json({
       success: true,

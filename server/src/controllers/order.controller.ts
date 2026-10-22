@@ -1,3 +1,4 @@
+
 import { Request, Response } from "express";
 import * as orderService from "../services/order.service";
 import { CustomerRequest } from "../middleware/customerAuth.middleware";
@@ -13,8 +14,6 @@ export async function create(req: Request, res: Response) {
 
     res.status(201).json(order);
   } catch (error) {
-    console.error(error);
-
     console.error("ORDER ERROR:", error);
 
     res.status(500).json({
@@ -45,13 +44,19 @@ export async function findAll(req: Request, res: Response) {
 }
 
 export async function findOne(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({ message: "Invalid order ID" });
+    return;
+  }
+
   try {
-    const order = await orderService.getOrder(req.params.id);
+    const order = await orderService.getOrder(id);
 
     if (!order) {
-      return res.status(404).json({
-        message: "Order not found",
-      });
+      res.status(404).json({ message: "Order not found" });
+      return;
     }
 
     res.json(order);
@@ -68,16 +73,20 @@ export async function findByReference(
   req: Request,
   res: Response
 ) {
+  const reference = req.params.reference;
+
+  if (typeof reference !== "string") {
+    res.status(400).json({ message: "Invalid order reference" });
+    return;
+  }
+
   try {
     const order =
-      await orderService.getOrderByReference(
-        req.params.reference
-      );
+      await orderService.getOrderByReference(reference);
 
     if (!order) {
-      return res.status(404).json({
-        message: "Order not found",
-      });
+      res.status(404).json({ message: "Order not found" });
+      return;
     }
 
     res.json(order);
@@ -94,15 +103,19 @@ export async function trackOrder(
   req: Request,
   res: Response
 ) {
+  const reference = req.params.reference;
+
+  if (typeof reference !== "string") {
+    res.status(400).json({ message: "Invalid order reference" });
+    return;
+  }
+
   try {
-    const order = await orderService.trackOrder(
-      req.params.reference
-    );
+    const order = await orderService.trackOrder(reference);
 
     if (!order) {
-      return res.status(404).json({
-        message: "Order not found",
-      });
+      res.status(404).json({ message: "Order not found" });
+      return;
     }
 
     res.json(order);
@@ -119,19 +132,26 @@ export async function approve(
   req: Request,
   res: Response
 ) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({ message: "Invalid order ID" });
+    return;
+  }
+
   try {
-    const order =
-      await orderService.approveOrder(req.params.id);
+    const order = await orderService.approveOrder(id);
 
     res.json({
       message: "Order approved successfully",
       order,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
 
     res.status(400).json({
-      message: error.message,
+      message:
+        error instanceof Error ? error.message : "Failed to approve order",
     });
   }
 }
@@ -140,9 +160,15 @@ export async function reject(
   req: Request,
   res: Response
 ) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({ message: "Invalid order ID" });
+    return;
+  }
+
   try {
-    const order =
-      await orderService.rejectOrder(req.params.id);
+    const order = await orderService.rejectOrder(id);
 
     res.json({
       message: "Order rejected successfully",
@@ -162,10 +188,9 @@ export async function customerOrders(
   res: Response
 ) {
   try {
-    const orders =
-      await orderService.getCustomerOrders(
-        req.customer!.id
-      );
+    const orders = await orderService.getCustomerOrders(
+      req.customer!.id
+    );
 
     res.json({
       success: true,
@@ -180,25 +205,26 @@ export async function customerOrders(
   }
 }
 
-// ===============================
-// NEW - Customer Order Details
-// ===============================
-
 export async function customerOrderDetails(
   req: CustomerRequest,
   res: Response
 ) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({ message: "Invalid order ID" });
+    return;
+  }
+
   try {
-    const order =
-      await orderService.getCustomerOrderById(
-        req.customer!.id,
-        req.params.id
-      );
+    const order = await orderService.getCustomerOrderById(
+      req.customer!.id,
+      id
+    );
 
     if (!order) {
-      return res.status(404).json({
-        message: "Order not found",
-      });
+      res.status(404).json({ message: "Order not found" });
+      return;
     }
 
     res.json({
@@ -219,8 +245,7 @@ export async function unreadCount(
   res: Response
 ) {
   try {
-    const count =
-      await orderService.getUnreadOrdersCount();
+    const count = await orderService.getUnreadOrdersCount();
 
     res.json({ count });
   } catch (error) {

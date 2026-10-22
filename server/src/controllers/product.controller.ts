@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+
+import { Request, Response, RequestHandler } from "express";
 import { logActivity } from "../services/activity.service";
 import { AuthRequest } from "../middleware/auth.middleware";
 import * as productPerformanceService from "../services/productPerformance.service";
@@ -15,61 +16,69 @@ import {
 } from "../services/product.service";
 
 export async function performance(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
+    return;
+  }
+
   try {
     const data =
-      await productPerformanceService.getProductPerformance(
-        req.params.id
-      );
+      await productPerformanceService.getProductPerformance(id);
 
     res.json(data);
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
+      success: false,
       message: "Failed to load product performance",
     });
   }
 }
 
-export async function create(req: AuthRequest, res: Response) {
+export const create: RequestHandler = async (req, res) => {
+  const authReq = req as AuthRequest;
+
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+    if (!authReq.user) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
 
     const product = await createProduct({
-  ...req.body,
-  price: Number(req.body.price),
-  quantity: Number(req.body.quantity),
-  image: req.file?.filename,
-});
+      ...req.body,
+      price: Number(req.body.price),
+      quantity: Number(req.body.quantity),
+      image: req.file?.filename,
+    });
 
-console.log("Authenticated user:", req.user);
+    await logActivity(
+      authReq.user.id,
+      "CREATE PRODUCT",
+      `Created product "${product.name}"`
+    );
 
-const activity = await logActivity(
-  req.user!.id,
-  "CREATE PRODUCT",
-  `Created product "${product.name}"`
-);
-
-console.log("Activity created:", activity);
-
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       product,
     });
   } catch (error) {
     console.error(error);
 
-    if (error instanceof Error) {
-      console.error(error.stack);
-    }
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : "Failed",
     });
   }
-}
+};
 
 export async function getAll(req: Request, res: Response) {
   try {
@@ -95,20 +104,33 @@ export async function getAll(req: Request, res: Response) {
     res.status(500).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to fetch products",
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch products",
     });
   }
 }
 
 export async function getOne(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
+    return;
+  }
+
   try {
-    const product = await getProductById(req.params.id);
+    const product = await getProductById(id);
 
     if (!product) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Product not found",
       });
+      return;
     }
 
     res.json({
@@ -119,29 +141,54 @@ export async function getOne(req: Request, res: Response) {
     res.status(500).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to fetch product",
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch product",
     });
   }
 }
 
-export async function update(req: AuthRequest, res: Response) {
+export const update: RequestHandler = async (req, res) => {
+  const authReq = req as AuthRequest;
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
+    return;
+  }
+
   try {
+    if (!authReq.user) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
     const data: any = {
       ...req.body,
-      price: req.body.price ? Number(req.body.price) : undefined,
-      quantity: req.body.quantity
-        ? Number(req.body.quantity)
-        : undefined,
+      price:
+        req.body.price !== undefined && req.body.price !== ""
+          ? Number(req.body.price)
+          : undefined,
+      quantity:
+        req.body.quantity !== undefined && req.body.quantity !== ""
+          ? Number(req.body.quantity)
+          : undefined,
     };
 
     if (req.file) {
       data.image = req.file.filename;
     }
 
-    const product = await updateProduct(req.params.id, data);
+    const product = await updateProduct(id, data);
 
     await logActivity(
-      req.user!.id,
+      authReq.user.id,
       "UPDATE PRODUCT",
       `Updated product "${product.name}"`
     );
@@ -154,30 +201,50 @@ export async function update(req: AuthRequest, res: Response) {
     res.status(400).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to update product",
+        error instanceof Error
+          ? error.message
+          : "Failed to update product",
     });
   }
-}
+};
 
-export async function remove(req: AuthRequest, res: Response) {
+export const remove: RequestHandler = async (req, res) => {
+  const authReq = req as AuthRequest;
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
+    return;
+  }
+
   try {
+    if (!authReq.user) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
     const product = await prisma.product.findUnique({
-      where: {
-        id: req.params.id,
-      },
+      where: { id },
     });
 
     if (!product) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Product not found",
       });
+      return;
     }
 
-    await deleteProduct(req.params.id);
+    await deleteProduct(id);
 
     await logActivity(
-      req.user!.id,
+      authReq.user.id,
       "DELETE PRODUCT",
       `Deleted product "${product.name}"`
     );
@@ -192,15 +259,16 @@ export async function remove(req: AuthRequest, res: Response) {
     res.status(400).json({
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to delete product",
+        error instanceof Error
+          ? error.message
+          : "Failed to delete product",
     });
   }
-}
+};
 
 export async function lowStock(req: Request, res: Response) {
   try {
     const limit = Number(req.query.limit) || 5;
-
     const products = await getLowStockProducts(limit);
 
     res.json({
@@ -224,24 +292,23 @@ export async function importProducts(
 ) {
   try {
     if (!req.file) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "No Excel file uploaded.",
       });
+      return;
     }
 
-    const result = await importProductsFromExcel(
-      req.file.buffer
-    );
+    const result = await importProductsFromExcel(req.file.buffer);
 
-    return res.json({
+    res.json({
       success: true,
       message: `${result} products imported successfully.`,
     });
   } catch (error) {
     console.error(error);
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message:
         error instanceof Error

@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+
+import { Request, Response, RequestHandler } from "express";
 import { loginUser } from "../services/auth.service";
 import { AuthRequest } from "../middleware/auth.middleware";
 
@@ -31,9 +32,19 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-export async function me(req: AuthRequest, res: Response) {
+export const me: RequestHandler = (req, res): void => {
+  const authReq = req as AuthRequest;
+
+  if (!authReq.user) {
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+    return;
+  }
+
   res.json({
     success: true,
-    user: req.user,
+    user: authReq.user,
   });
-}
+};

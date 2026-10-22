@@ -1,27 +1,28 @@
-import { Response, NextFunction } from "express";
+
+import { RequestHandler } from "express";
 import { AuthRequest } from "./auth.middleware";
 
-export function authorize(...roles: string[]) {
-  return (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
-    console.log("Decoded user:", req.user);
+export function authorize(...roles: string[]): RequestHandler {
+  return (req, res, next): void => {
+    const authReq = req as AuthRequest;
+
+    console.log("Decoded user:", authReq.user);
     console.log("Allowed roles:", roles);
 
-    if (!req.user) {
-      return res.status(401).json({
+    if (!authReq.user) {
+      res.status(401).json({
         success: false,
         message: "Unauthorized",
       });
+      return;
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
+    if (!roles.includes(authReq.user.role)) {
+      res.status(403).json({
         success: false,
         message: "Forbidden: You do not have permission.",
       });
+      return;
     }
 
     next();
