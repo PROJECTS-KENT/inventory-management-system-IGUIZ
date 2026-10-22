@@ -1,23 +1,22 @@
-import axios from "axios";
 
-const API = "http://localhost:5000/api/orders";
+import api from "./api";
 
 export async function getOrders() {
-  const res = await axios.get(API);
+  const res = await api.get("/orders");
   return res.data.orders;
 }
 
 export async function getOrder(id: string) {
-  const res = await axios.get(`${API}/${id}`);
+  const res = await api.get(`/orders/${id}`);
   return res.data;
 }
 
 export async function approveOrder(id: string) {
-  const res = await axios.patch(`${API}/${id}/approve`);
+  const res = await api.patch(`/orders/${id}/approve`);
   return res.data;
 }
 
 export async function rejectOrder(id: string) {
-  const res = await axios.patch(`${API}/${id}/reject`);
+  const res = await api.patch(`/orders/${id}/reject`);
   return res.data;
 }

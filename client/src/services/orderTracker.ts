@@ -1,10 +1,9 @@
-import axios from "axios";
 
-const API = "http://localhost:5000/orders";
+import api from "./api";
 
 export async function trackOrder(reference: string) {
-  const res = await axios.get(
-    `${API}/reference/${reference}`
+  const res = await api.get(
+    `/orders/reference/${encodeURIComponent(reference)}`
   );
 
   return res.data;

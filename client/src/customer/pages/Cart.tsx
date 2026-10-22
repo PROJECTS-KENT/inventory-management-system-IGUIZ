@@ -1,6 +1,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { API_BASE_URL, SERVER_URL } from "../../services/api";
 
 const backgroundImage =
   "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1600&auto=format&fit=crop&q=85";
@@ -34,7 +35,7 @@ export default function Cart() {
     if (!customerToken) {
       localStorage.setItem("redirectAfterLogin", "/checkout");
       window.location.href =
-        "http://localhost:5000/api/customer/auth/google";
+        `${API_BASE_URL}/customer/auth/google`;
       return;
     }
 
@@ -191,7 +192,7 @@ export default function Cart() {
                       {/* Product image */}
                       <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30 sm:h-32 sm:w-32">
                         <img
-                          src={`http://localhost:5000/uploads/products/${item.image}`}
+                          src={`${SERVER_URL}/uploads/products/${item.image}`}
                           alt={item.name}
                           className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
                           onError={(event) => {

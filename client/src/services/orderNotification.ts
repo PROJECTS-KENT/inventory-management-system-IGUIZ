@@ -1,17 +1,11 @@
-import axios from "axios";
 
-const API = "http://localhost:5000/api/orders";
+import api from "./api";
 
 export async function getUnreadOrders() {
-  const res = await axios.get(
-    `${API}/notifications/unread`
-  );
-
+  const res = await api.get("/orders/notifications/unread");
   return res.data.count;
 }
 
 export async function clearUnreadOrders() {
-  await axios.patch(
-    `${API}/notifications/viewed`
-  );
+  await api.patch("/orders/notifications/viewed");
 }

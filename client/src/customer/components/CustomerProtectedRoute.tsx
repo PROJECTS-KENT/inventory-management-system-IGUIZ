@@ -1,4 +1,6 @@
 
+import { API_BASE_URL } from "../../services/api";
+
 interface Props {
   children: React.ReactNode;
 }
@@ -14,8 +16,7 @@ export default function CustomerProtectedRoute({
       window.location.pathname
     );
 
-    window.location.href =
-      "http://localhost:5000/api/customer/auth/google";
+    window.location.href = `${API_BASE_URL}/customer/auth/google`;
 
     return null;
   }

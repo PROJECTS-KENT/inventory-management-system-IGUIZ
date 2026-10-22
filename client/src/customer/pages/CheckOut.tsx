@@ -1,4 +1,5 @@
 
+import { API_BASE_URL, SERVER_URL } from "../../services/api";
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -70,7 +71,7 @@ export default function Checkout() {
     if (!localStorage.getItem("customerToken")) {
       localStorage.setItem("redirectAfterLogin", "/checkout");
       window.location.href =
-        "http://localhost:5000/api/customer/auth/google";
+        `${API_BASE_URL}/customer/auth/google`;
       return;
     }
 
@@ -449,7 +450,7 @@ export default function Checkout() {
                           >
                             <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30">
                               <img
-                                src={`http://localhost:5000/uploads/products/${item.image}`}
+                                src={`${SERVER_URL}/uploads/products/${item.image}`}
                                 alt={item.name}
                                 className="h-full w-full object-contain p-1"
                                 onError={(event) => {

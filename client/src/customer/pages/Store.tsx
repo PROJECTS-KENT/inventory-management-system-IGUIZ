@@ -1,4 +1,5 @@
 
+import { API_BASE_URL } from "../../services/api";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -88,7 +89,7 @@ export default function Store() {
 
       localStorage.setItem("redirectAfterLogin", "/store");
       window.location.href =
-        "http://localhost:5000/api/customer/auth/google";
+       `${API_BASE_URL}/customer/auth/google`
 
       return;
     }

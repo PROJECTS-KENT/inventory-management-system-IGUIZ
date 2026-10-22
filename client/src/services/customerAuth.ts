@@ -1,6 +1,6 @@
-const API =
-  "http://localhost:5000/api/customer/auth";
+
+import { API_BASE_URL } from "./api";
 
 export function googleLogin() {
-  window.location.href = `${API}/google`;
+  window.location.href = `${API_BASE_URL}/customer/auth/google`;
 }

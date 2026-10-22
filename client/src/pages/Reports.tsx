@@ -24,6 +24,7 @@ import Card from "../components/Card";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import api, { SERVER_URL } from "../services/api";
 
 interface Product {
   id: number | string;
@@ -93,21 +94,8 @@ export default function Reports() {
     setAnalyticsError(false);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/reports/analytics",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to load analytics.");
-      }
-
-      const data = await response.json();
-      setAnalytics(data);
+      const response = await api.get("/reports/analytics");
+      setAnalytics(response.data);
     } catch (error) {
       console.error("Failed to load analytics:", error);
       setAnalyticsError(true);
@@ -341,7 +329,6 @@ export default function Reports() {
                     <p className="text-sm font-medium text-slate-400">
                       {item.label}
                     </p>
-
                     <p className="mt-3 break-words text-2xl font-bold tracking-tight text-white">
                       {loadingAnalytics
                         ? "Loading..."
@@ -439,11 +426,9 @@ export default function Reports() {
                           </span>
                         </div>
                       </td>
-
                       <td className="px-5 py-4 text-center text-slate-300">
                         {formatNumber(item.orders)}
                       </td>
-
                       <td className="px-5 py-4 text-center">
                         <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-300">
                           {formatNumber(item.sold)}
@@ -621,30 +606,14 @@ export default function Reports() {
             <table className="w-full min-w-[950px] text-sm">
               <thead className="bg-[#0C0D17] text-xs uppercase tracking-wider text-slate-400">
                 <tr>
-                  <th className="w-14 px-4 py-4 text-center font-semibold">
-                    #
-                  </th>
-                  <th className="px-4 py-4 text-center font-semibold">
-                    Image
-                  </th>
-                  <th className="px-4 py-4 text-left font-semibold">
-                    Product
-                  </th>
-                  <th className="px-4 py-4 text-center font-semibold">
-                    Category
-                  </th>
-                  <th className="px-4 py-4 text-center font-semibold">
-                    Supplier
-                  </th>
-                  <th className="px-4 py-4 text-right font-semibold">
-                    Price
-                  </th>
-                  <th className="px-4 py-4 text-center font-semibold">
-                    Stock
-                  </th>
-                  <th className="px-4 py-4 text-right font-semibold">
-                    Total Value
-                  </th>
+                  <th className="w-14 px-4 py-4 text-center font-semibold">#</th>
+                  <th className="px-4 py-4 text-center font-semibold">Image</th>
+                  <th className="px-4 py-4 text-left font-semibold">Product</th>
+                  <th className="px-4 py-4 text-center font-semibold">Category</th>
+                  <th className="px-4 py-4 text-center font-semibold">Supplier</th>
+                  <th className="px-4 py-4 text-right font-semibold">Price</th>
+                  <th className="px-4 py-4 text-center font-semibold">Stock</th>
+                  <th className="px-4 py-4 text-right font-semibold">Total Value</th>
                 </tr>
               </thead>
 
@@ -656,9 +625,7 @@ export default function Reports() {
                         size={24}
                         className="mx-auto mb-3 animate-spin text-violet-300"
                       />
-                      <p className="text-slate-400">
-                        Loading inventory...
-                      </p>
+                      <p className="text-slate-400">Loading inventory...</p>
                     </td>
                   </tr>
                 ) : filteredProducts.length === 0 ? (
@@ -694,7 +661,7 @@ export default function Reports() {
                           <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
                             {product.image ? (
                               <img
-                                src={`http://localhost:5000/uploads/products/${product.image}`}
+                                src={`${SERVER_URL}/uploads/products/${product.image}`}
                                 alt={product.name}
                                 loading="lazy"
                                 className="h-full w-full object-cover"
@@ -770,7 +737,6 @@ export default function Reports() {
         </Card>
       </section>
 
-      {/* Keep printed reports readable without the dark application theme. */}
       <style>{`
         @media print {
           body {

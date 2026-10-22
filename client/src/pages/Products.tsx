@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
+import { SERVER_URL } from "../services/api";
 
 interface Product {
   id: string;
@@ -118,7 +119,6 @@ export default function Products() {
 
     try {
       await deleteProduct(id);
-
       toast.success("Product deleted successfully!");
       await refreshProducts();
     } catch (error) {
@@ -148,7 +148,6 @@ export default function Products() {
         subtitle="Manage your keyboard collection, pricing, suppliers, and stock levels."
       />
 
-      {/* Page actions */}
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">
@@ -171,7 +170,6 @@ export default function Products() {
         </button>
       </div>
 
-      {/* Summary cards */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <div className="flex items-center justify-between gap-3">
@@ -219,13 +217,10 @@ export default function Products() {
         </Card>
       </div>
 
-      {/* Products table */}
       <Card className="overflow-hidden">
         <div className="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
-            <h2 className="text-lg font-bold text-white">
-              All Products
-            </h2>
+            <h2 className="text-lg font-bold text-white">All Products</h2>
             <p className="mt-1 text-sm text-slate-500">
               {search
                 ? `Search results for "${search}"`
@@ -263,7 +258,6 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Inventory value */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violet-400/10 bg-violet-400/[0.04] px-4 py-3">
           <span className="text-sm text-slate-400">
             Listed inventory value
@@ -365,7 +359,7 @@ export default function Products() {
                     <td className="px-4 py-4">
                       {product.image ? (
                         <img
-                          src={`http://localhost:5000/uploads/products/${product.image}`}
+                          src={`${SERVER_URL}/uploads/products/${product.image}`}
                           alt={product.name}
                           className="mx-auto h-14 w-14 rounded-xl border border-white/10 object-cover"
                         />

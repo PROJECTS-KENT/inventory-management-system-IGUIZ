@@ -1,17 +1,23 @@
+
 import api from "./api";
+
+export async function getTransactions() {
+  const res = await api.get("/inventory/history");
+  return res.data;
+}
 
 export async function stockIn(
   productId: string,
   quantity: number,
   remarks: string
 ) {
-  const response = await api.post("/inventory/stock-in", {
+  const res = await api.post("/inventory/stock-in", {
     productId,
     quantity,
     remarks,
   });
 
-  return response.data;
+  return res.data;
 }
 
 export async function stockOut(
@@ -19,16 +25,11 @@ export async function stockOut(
   quantity: number,
   remarks: string
 ) {
-  const response = await api.post("/inventory/stock-out", {
+  const res = await api.post("/inventory/stock-out", {
     productId,
     quantity,
     remarks,
   });
 
-  return response.data;
-}
-
-export async function getTransactions() {
-  const response = await api.get("/inventory/history");
-  return response.data.transactions;
+  return res.data;
 }

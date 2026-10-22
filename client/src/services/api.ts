@@ -1,8 +1,14 @@
 
 import axios from "axios";
 
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+// The backend origin is used for uploaded product images.
+export const SERVER_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: API_BASE_URL,
 });
 
 // Identify requests that require customer authentication.
@@ -14,7 +20,6 @@ function isCustomerRequest(url: string) {
   );
 }
 
-// Attach the appropriate token to each request.
 api.interceptors.request.use(
   (config) => {
     const url = config.url || "";
@@ -35,7 +40,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle unauthorized responses.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
