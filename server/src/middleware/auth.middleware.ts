@@ -1,5 +1,9 @@
-
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import {
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from "express";
 import prisma from "../config/prisma";
 import { verifyToken } from "../utils/jwt";
 
@@ -27,14 +31,21 @@ export const authenticate: RequestHandler = async (
     return;
   }
 
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.slice("Bearer ".length).trim();
+
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid token",
+    });
+    return;
+  }
 
   try {
     const decoded = verifyToken(token);
 
     if (
-      typeof decoded !== "object" ||
-      decoded === null ||
+      typeof decoded === "string" ||
       !("id" in decoded) ||
       typeof decoded.id !== "string"
     ) {
@@ -73,12 +84,13 @@ export const authenticate: RequestHandler = async (
     };
 
     next();
-  } catch (error) {
+  } catch (error: unknown) {
     if (
       error instanceof Error &&
       error.name === "PrismaClientKnownRequestError"
     ) {
       console.error("Authentication database error:", error.message);
+
       res.status(500).json({
         success: false,
         message: "Unable to verify account status",

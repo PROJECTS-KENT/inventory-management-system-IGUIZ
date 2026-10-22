@@ -1,6 +1,14 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "development_secret";
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET is missing from environment variables");
+  }
+
+  return secret;
+}
 
 export function generateToken(userId: string, role: string) {
   return jwt.sign(
@@ -8,7 +16,7 @@ export function generateToken(userId: string, role: string) {
       id: userId,
       role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: "7d",
     }
@@ -16,5 +24,5 @@ export function generateToken(userId: string, role: string) {
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, getJwtSecret());
 }
