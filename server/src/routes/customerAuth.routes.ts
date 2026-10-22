@@ -33,9 +33,11 @@ router.get(
 
     const token = generateCustomerToken(customer.id);
 
-    res.redirect(
-      `http://localhost:5173/customer/auth/success?token=${token}`
-    );
+   const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+
+res.redirect(
+  `${clientUrl.replace(/\/$/, "")}/customer/auth/success?token=${token}`
+);
   }
 );
 
