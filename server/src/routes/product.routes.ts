@@ -1,4 +1,10 @@
 import { Router } from "express";
+import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
+
+import excelUpload from "../middleware/upload";
+import imageUpload from "../middleware/productUpload";
+
 import {
   create,
   getAll,
@@ -6,21 +12,73 @@ import {
   update,
   remove,
   lowStock,
+  importProducts,
+  performance,
 } from "../controllers/product.controller";
-import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.post("/", authenticate, create);
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES
+|--------------------------------------------------------------------------
+*/
 
-router.get("/", authenticate, getAll);
+// Anyone can view products
+router.get("/", getAll);
 
-router.get("/low-stock", authenticate, lowStock);
+// Low stock
+router.get(
+  "/low-stock",
+  authenticate,
+  lowStock
+);
 
-router.get("/:id", authenticate, getOne);
+router.get("/:id/performance", performance);
 
-router.put("/:id", authenticate, update);
+// Anyone can view a single product
+router.get("/:id", getOne);
 
-router.delete("/:id", authenticate, remove);
+/*
+|--------------------------------------------------------------------------
+| ADMIN / STAFF ROUTES
+|--------------------------------------------------------------------------
+*/
+
+
+// Create product
+router.post(
+  "/",
+  authenticate,
+  authorize("ADMIN"),
+  imageUpload.single("image"),
+  create
+);
+
+// Import Excel
+router.post(
+  "/import",
+  authenticate,
+  authorize("ADMIN"),
+  excelUpload.single("file"),
+  importProducts
+);
+
+// Update product
+router.put(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  imageUpload.single("image"),
+  update
+);
+
+// Delete product
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  remove
+);
 
 export default router;

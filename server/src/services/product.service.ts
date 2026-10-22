@@ -1,9 +1,11 @@
 import prisma from "../config/prisma";
+import * as XLSX from "xlsx";
 
 export async function createProduct(data: {
   name: string;
   sku: string;
   description?: string;
+  image?: string;
   price: number;
   quantity: number;
   categoryId: string;
@@ -89,6 +91,15 @@ export async function getProductById(id: string) {
     include: {
       category: true,
       supplier: true,
+
+      transactions: {
+        include: {
+          user: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 }
@@ -96,14 +107,15 @@ export async function getProductById(id: string) {
 export async function updateProduct(
   id: string,
   data: {
-    name?: string;
-    sku?: string;
-    description?: string;
-    price?: number;
-    quantity?: number;
-    categoryId?: string;
-    supplierId?: string;
-  }
+  name?: string;
+  sku?: string;
+  description?: string;
+  image?: string;
+  price?: number;
+  quantity?: number;
+  categoryId?: string;
+  supplierId?: string;
+}
 ) {
   return prisma.product.update({
     where: { id },
@@ -116,12 +128,21 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string) {
+  // Delete inventory history first
+  await prisma.inventoryTransaction.deleteMany({
+    where: {
+      productId: id,
+    },
+  });
+
   return prisma.product.delete({
-    where: { id },
+    where: {
+      id,
+    },
   });
 }
 
-export async function getLowStockProducts(limit: number = 5) {
+export async function getLowStockProducts(limit: number = 10) {
   return prisma.product.findMany({
     where: {
       quantity: {
@@ -136,4 +157,72 @@ export async function getLowStockProducts(limit: number = 5) {
       quantity: "asc",
     },
   });
+}
+
+/* ===========================================
+   IMPORT PRODUCTS FROM EXCEL
+=========================================== */
+
+export async function importProductsFromExcel(
+  buffer: Buffer
+): Promise<number> {
+  const workbook = XLSX.read(buffer, {
+    type: "buffer",
+  });
+
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  const rows: any[] = XLSX.utils.sheet_to_json(sheet);
+
+  let imported = 0;
+
+  for (const row of rows) {
+    const category = await prisma.category.findFirst({
+      where: {
+        name: row.Category,
+      },
+    });
+
+    const supplier = await prisma.supplier.findFirst({
+      where: {
+        name: row.Supplier,
+      },
+    });
+
+    if (!category || !supplier) {
+      console.log(
+        `Skipped ${row.Name}: Category or Supplier not found.`
+      );
+      continue;
+    }
+
+    const existing = await prisma.product.findUnique({
+      where: {
+        sku: row.SKU,
+      },
+    });
+
+    if (existing) {
+      console.log(
+        `Skipped ${row.Name}: SKU already exists.`
+      );
+      continue;
+    }
+
+    await prisma.product.create({
+      data: {
+        name: row.Name,
+        sku: row.SKU,
+        description: row.Description || "",
+        price: Number(row.Price),
+        quantity: Number(row.Quantity),
+        categoryId: category.id,
+        supplierId: supplier.id,
+      },
+    });
+
+    imported++;
+  }
+
+  return imported;
 }

@@ -4,3 +4,17 @@ dist
 .next
 coverage
 /generated/prisma
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and production builds
+node_modules/
+dist/
+coverage/
+
+# User-uploaded files
+server/uploads/*
+!server/uploads/.gitkeep

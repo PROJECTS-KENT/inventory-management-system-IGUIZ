@@ -9,7 +9,6 @@ datasource db {
 
 enum Role {
   ADMIN
-  STAFF
 }
 
 enum TransactionType {
@@ -17,16 +16,53 @@ enum TransactionType {
   OUT
 }
 
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id       String  @id @default(cuid())
   name     String
   email    String  @unique
   password String
-  role     Role    @default(STAFF)
+  role     Role    @default(ADMIN)
   isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  transactions InventoryTransaction[]
+  activityLogs ActivityLog[]
+}
+
+model Customer {
+  id String @id @default(cuid())
+
+  name String
+
+  email String @unique
+
+  password String?
+
+  googleId String? @unique
+
+  phone String?
+
+  address String?
+
+  city String?
+
+  province String?
+
+  zip String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
 }
 
 model Category {
@@ -57,9 +93,14 @@ model Product {
   name        String
   sku         String  @unique
   description String?
+  image       String?
 
   price    Float
   quantity Int   @default(0)
+
+  brand String @default("Generic")
+
+  connection String @default("Wired")
 
   categoryId String
   supplierId String
@@ -69,22 +110,93 @@ model Product {
 
   transactions InventoryTransaction[]
 
+  orderItems OrderItem[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model InventoryTransaction {
-  id        String @id @default(cuid())
+model Order {
+  id String @id @default(cuid())
 
-  type      TransactionType
+  reference String @unique
 
-  quantity  Int
+  customerName String
 
-  remarks   String?
+  email String
+
+  phone String
+
+  address String
+
+  city String
+
+  province String
+
+  zip String
+
+  notes String?
+
+  total Float
+
+  status OrderStatus @default(PENDING)
+
+  isViewed Boolean @default(false)
+
+  customerId String?
+
+  customer Customer? @relation(fields: [customerId], references: [id])
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
 
   productId String
 
+  quantity Int
+
+  price Float
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model InventoryTransaction {
+  id String @id @default(cuid())
+
+  type TransactionType
+
+  quantity Int
+
+  remarks String?
+
+  productId String
   product   Product @relation(fields: [productId], references: [id])
 
+  userId String?
+
+  user User? @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id String @id @default(cuid())
+
+  action String
+
+  details String
+
+  createdAt DateTime @default(now())
+
+  userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

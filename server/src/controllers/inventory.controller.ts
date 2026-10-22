@@ -9,9 +9,12 @@ export async function addStock(req: Request, res: Response) {
   try {
     const { productId, quantity, remarks } = req.body;
 
+    const userId = (req as any).user.id;
+
     const product = await stockIn(
       productId,
       Number(quantity),
+      userId,
       remarks
     );
 
@@ -22,7 +25,10 @@ export async function addStock(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
     });
   }
 }
@@ -31,9 +37,12 @@ export async function removeStock(req: Request, res: Response) {
   try {
     const { productId, quantity, remarks } = req.body;
 
+    const userId = (req as any).user.id;
+
     const product = await stockOut(
       productId,
       Number(quantity),
+      userId,
       remarks
     );
 
@@ -44,7 +53,10 @@ export async function removeStock(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
     });
   }
 }

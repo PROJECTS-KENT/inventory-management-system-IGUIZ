@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import {
   createCategory,
   getCategories,
+  updateCategory,
+  deleteCategory,
 } from "../services/category.service";
 
 export async function create(req: Request, res: Response) {
@@ -17,16 +19,68 @@ export async function create(req: Request, res: Response) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error ? error.message : "Something went wrong",
     });
   }
 }
 
 export async function list(req: Request, res: Response) {
-  const categories = await getCategories();
+  try {
+    const categories = await getCategories();
 
-  res.json({
-    success: true,
-    categories,
-  });
+    res.json({
+      success: true,
+      categories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch categories",
+    });
+  }
+}
+
+export async function update(req: Request, res: Response) {
+  try {
+    const category = await updateCategory(
+      req.params.id,
+      req.body.name
+    );
+
+    res.json({
+      success: true,
+      category,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to update category",
+    });
+  }
+}
+
+export async function remove(req: Request, res: Response) {
+  try {
+    await deleteCategory(req.params.id);
+
+    res.json({
+      success: true,
+      message: "Category deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to delete category",
+    });
+  }
 }

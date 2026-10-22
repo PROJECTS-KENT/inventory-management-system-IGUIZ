@@ -1,23 +1,13 @@
 import { Request, Response } from "express";
-import { registerUser, loginUser } from "../services/auth.service";
+import { loginUser } from "../services/auth.service";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 export async function register(req: Request, res: Response) {
-  try {
-    const { name, email, password } = req.body;
-
-    const user = await registerUser(name, email, password);
-
-    res.status(201).json({
-      success: true,
-      user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    });
-  }
+  return res.status(403).json({
+    success: false,
+    message:
+      "Public registration is disabled. Contact an administrator for an account.",
+  });
 }
 
 export async function login(req: Request, res: Response) {
@@ -33,7 +23,10 @@ export async function login(req: Request, res: Response) {
   } catch (error) {
     res.status(401).json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
     });
   }
 }

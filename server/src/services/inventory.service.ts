@@ -3,10 +3,13 @@ import prisma from "../config/prisma";
 export async function stockIn(
   productId: string,
   quantity: number,
+  userId: string,
   remarks?: string
 ) {
   const product = await prisma.product.findUnique({
-    where: { id: productId },
+    where: {
+      id: productId,
+    },
   });
 
   if (!product) {
@@ -19,11 +22,14 @@ export async function stockIn(
       quantity,
       remarks,
       productId,
+      userId,
     },
   });
 
   return prisma.product.update({
-    where: { id: productId },
+    where: {
+      id: productId,
+    },
     data: {
       quantity: {
         increment: quantity,
@@ -35,10 +41,13 @@ export async function stockIn(
 export async function stockOut(
   productId: string,
   quantity: number,
+  userId: string,
   remarks?: string
 ) {
   const product = await prisma.product.findUnique({
-    where: { id: productId },
+    where: {
+      id: productId,
+    },
   });
 
   if (!product) {
@@ -55,11 +64,14 @@ export async function stockOut(
       quantity,
       remarks,
       productId,
+      userId,
     },
   });
 
   return prisma.product.update({
-    where: { id: productId },
+    where: {
+      id: productId,
+    },
     data: {
       quantity: {
         decrement: quantity,
@@ -72,6 +84,7 @@ export async function getInventoryHistory() {
   return prisma.inventoryTransaction.findMany({
     include: {
       product: true,
+      user: true,
     },
     orderBy: {
       createdAt: "desc",
