@@ -7,7 +7,7 @@ const googleClientID = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleCallbackURL =
   process.env.GOOGLE_CALLBACK_URL ||
-  "http://localhost:5000/api/customer/auth/google/callback";
+  "https://keyverse-api-80o8.onrender.com/api/customer/auth/google/callback";
 
 // Only enable Google login when both credentials are configured.
 if (googleClientID && googleClientSecret) {
