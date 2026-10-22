@@ -25,9 +25,21 @@ import customerAuthRoutes from "./routes/customerAuth.routes";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+].filter((origin): origin is string => Boolean(origin));
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests without an Origin header, such as health checks.
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -44,11 +56,22 @@ app.use(morgan("dev"));
 
 app.use(express.json());
 
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret && process.env.NODE_ENV === "production") {
+  throw new Error("SESSION_SECRET must be set in production");
+}
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "inventory-secret",
+    secret: sessionSecret || "inventory-secret",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    },
   })
 );
 
