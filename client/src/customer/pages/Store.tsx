@@ -1,5 +1,5 @@
 
-import { API_BASE_URL } from "../../services/api";
+import { API_BASE_URL, SERVER_URL } from "../../services/api";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -183,7 +183,7 @@ export default function Store() {
                 onClick={() => {
                   localStorage.setItem("redirectAfterLogin", "/store");
                   window.location.href =
-                    "http://localhost:5000/api/customer/auth/google";
+                    `${API_BASE_URL}/customer/auth/google`;
                 }}
                 className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-3 py-2.5 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/20 sm:px-4"
               >
@@ -410,7 +410,7 @@ export default function Store() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-violet-500/5 to-blue-500/10 opacity-0 transition group-hover:opacity-100" />
 
                     <img
-                      src={`http://localhost:5000/uploads/products/${product.image}`}
+                      src={`${SERVER_URL}/uploads/products/${product.image}`}
                       alt={product.name}
                       loading="lazy"
                       className="h-56 w-full object-contain p-5 transition duration-500 group-hover:scale-105"
