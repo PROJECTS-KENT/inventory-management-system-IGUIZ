@@ -1,4 +1,3 @@
-
 import { API_BASE_URL, SERVER_URL } from "../../services/api";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,8 +22,6 @@ export default function Store() {
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [brand, setBrand] = useState("All");
-  const [connection, setConnection] = useState("All");
 
   useEffect(() => {
     async function loadProducts() {
@@ -47,7 +44,7 @@ export default function Store() {
 
     if (search.trim()) {
       result = result.filter((p) =>
-        p.name?.toLowerCase().includes(search.toLowerCase())
+        p.name?.toLowerCase().includes(search.trim().toLowerCase())
       );
     }
 
@@ -55,16 +52,8 @@ export default function Store() {
       result = result.filter((p) => p.category?.name === category);
     }
 
-    if (brand !== "All") {
-      result = result.filter((p) => p.brand === brand);
-    }
-
-    if (connection !== "All") {
-      result = result.filter((p) => p.connection === connection);
-    }
-
     setFiltered(result);
-  }, [search, category, brand, connection, products]);
+  }, [search, category, products]);
 
   const categories = [
     "All",
@@ -73,23 +62,12 @@ export default function Store() {
     ),
   ];
 
-  const brands = [
-    "All",
-    ...new Set(products.map((p) => p.brand).filter(Boolean)),
-  ];
-
-  const connections = [
-    "All",
-    ...new Set(products.map((p) => p.connection).filter(Boolean)),
-  ];
-
   function handleAddToCart(product: any) {
     if (!isSignedIn) {
       toast("Sign in with Google to add keyboards to your cart.");
 
       localStorage.setItem("redirectAfterLogin", "/store");
-      window.location.href =
-       `${API_BASE_URL}/customer/auth/google`
+      window.location.href = `${API_BASE_URL}/customer/auth/google`;
 
       return;
     }
@@ -182,8 +160,7 @@ export default function Store() {
               <button
                 onClick={() => {
                   localStorage.setItem("redirectAfterLogin", "/store");
-                  window.location.href =
-                    `${API_BASE_URL}/customer/auth/google`;
+                  window.location.href = `${API_BASE_URL}/customer/auth/google`;
                 }}
                 className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-3 py-2.5 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/20 sm:px-4"
               >
@@ -191,34 +168,32 @@ export default function Store() {
               </button>
             )}
 
-            
-<Link
-  to="/login"
-  className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-violet-400/30 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-slate-200 backdrop-blur-xl transition hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white sm:px-4 sm:text-sm"
->
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    className="h-4 w-4 text-violet-300"
-    aria-hidden="true"
-  >
-    <path
-      d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinejoin="round"
-    />
-    <path
-      d="m9 12 2 2 4-4"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-  <span>Sign in as Admin</span>
-</Link>
-
+            <Link
+              to="/login"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-violet-400/30 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-slate-200 backdrop-blur-xl transition hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white sm:px-4 sm:text-sm"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="h-4 w-4 text-violet-300"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="m9 12 2 2 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Sign in as Admin</span>
+            </Link>
 
             <Link
               to="/cart"
@@ -299,17 +274,18 @@ export default function Store() {
                 Explore Keyboards
               </h2>
               <p className="mt-2 text-sm text-slate-400">
-                Find the right feel, connection, and style for you.
+                Find the right keyboard for you.
               </p>
             </div>
 
             <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
-              {filtered.length} {filtered.length === 1 ? "product" : "products"}
+              {filtered.length}{" "}
+              {filtered.length === 1 ? "product" : "products"}
             </span>
           </div>
 
-          {/* Search and filters */}
-          <div className="mb-8 grid gap-3 rounded-2xl border border-white/10 bg-slate-900/65 p-4 shadow-2xl shadow-black/10 backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4">
+          {/* Search and category filter */}
+          <div className="mb-8 grid gap-3 rounded-2xl border border-white/10 bg-slate-900/65 p-4 shadow-2xl shadow-black/10 backdrop-blur-xl sm:grid-cols-2">
             <div className="relative">
               <svg
                 viewBox="0 0 24 24"
@@ -344,32 +320,6 @@ export default function Store() {
                 </option>
               ))}
             </select>
-
-            <select
-              aria-label="Filter by brand"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              className={selectClasses}
-            >
-              {brands.map((b) => (
-                <option key={b} value={b} className="bg-slate-900">
-                  {b === "All" ? "All Brands" : b}
-                </option>
-              ))}
-            </select>
-
-            <select
-              aria-label="Filter by connection"
-              value={connection}
-              onChange={(e) => setConnection(e.target.value)}
-              className={selectClasses}
-            >
-              {connections.map((c) => (
-                <option key={c} value={c} className="bg-slate-900">
-                  {c === "All" ? "All Connections" : c}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Products */}
@@ -385,14 +335,12 @@ export default function Store() {
               <p className="text-4xl">⌕</p>
               <h3 className="mt-4 text-xl font-bold">No keyboards found</h3>
               <p className="mt-2 text-sm text-slate-400">
-                Try another search or reset your filters.
+                Try another search or reset your category filter.
               </p>
               <button
                 onClick={() => {
                   setSearch("");
                   setCategory("All");
-                  setBrand("All");
-                  setConnection("All");
                 }}
                 className="mt-6 rounded-xl border border-violet-400/30 px-5 py-3 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/10"
               >
@@ -442,9 +390,7 @@ export default function Store() {
 
                     <div className="mt-auto pt-5">
                       <div className="mb-4 flex items-end justify-between gap-2">
-                        <span className="text-xs text-slate-400">
-                          Price
-                        </span>
+                        <span className="text-xs text-slate-400">Price</span>
                         <span className="text-xl font-extrabold tracking-tight text-white">
                           <span className="mr-1 text-sm font-semibold text-violet-400">
                             ₱
