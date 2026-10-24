@@ -86,7 +86,7 @@ export async function getAll(req: Request, res: Response) {
     const category = req.query.category as string | undefined;
     const supplier = req.query.supplier as string | undefined;
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 1000;
 
     const result = await getProducts(
       search,
