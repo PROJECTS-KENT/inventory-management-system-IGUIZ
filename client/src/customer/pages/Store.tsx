@@ -357,12 +357,22 @@ export default function Store() {
                   <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950">
                     <div className="absolute inset-0 bg-gradient-to-tr from-violet-500/5 to-blue-500/10 opacity-0 transition group-hover:opacity-100" />
 
-                    <img
-                      src={`${SERVER_URL}/uploads/products/${product.image}`}
-                      alt={product.name}
-                      loading="lazy"
-                      className="h-56 w-full object-contain p-5 transition duration-500 group-hover:scale-105"
-                    />
+                   <img
+  src={
+    product.image?.startsWith("https://") ||
+    product.image?.startsWith("http://")
+      ? product.image
+      : product.image
+        ? `${SERVER_URL}/uploads/products/${product.image}`
+        : undefined
+  }
+  alt={product.name}
+  loading="lazy"
+  onError={(e) => {
+    e.currentTarget.style.display = "none";
+  }}
+  className="h-56 w-full object-contain p-5 transition duration-500 group-hover:scale-105"
+/>
 
                     <span className="absolute left-3 top-3 rounded-lg border border-white/10 bg-slate-950/75 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur">
                       {product.brand || "Keyboard"}

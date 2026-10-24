@@ -190,16 +190,23 @@ export default function Cart() {
                   >
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                       {/* Product image */}
-                      <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30 sm:h-32 sm:w-32">
-                        <img
-                          src={`${SERVER_URL}/uploads/products/${item.image}`}
-                          alt={item.name}
-                          className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
-                          onError={(event) => {
-                            event.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
+                     <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30 sm:h-32 sm:w-32">
+  <img
+    src={
+      item.image?.startsWith("https://") ||
+      item.image?.startsWith("http://")
+        ? item.image
+        : item.image
+          ? `${SERVER_URL}/uploads/products/${item.image}`
+          : undefined
+    }
+    alt={item.name}
+    className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
+    onError={(event) => {
+      event.currentTarget.style.display = "none";
+    }}
+  />
+</div>
 
                       {/* Product information */}
                       <div className="min-w-0 flex-1">

@@ -82,20 +82,28 @@ export default function ProductDetails() {
 
       {/* Product Information */}
       <Card>
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="flex justify-center">
-            {product.image ? (
-              <img
-                src={`${SERVER_URL}/uploads/products/${product.image}`}
-                alt={product.name}
-                className="h-72 w-72 rounded-xl border object-cover"
-              />
-            ) : (
-              <div className="flex h-72 w-72 items-center justify-center rounded-xl bg-gray-200">
-                No Image
-              </div>
-            )}
-          </div>
+       <div className="grid gap-8 md:grid-cols-2">
+  <div className="flex justify-center">
+    {product.image ? (
+      <img
+        src={
+          product.image.startsWith("https://") ||
+          product.image.startsWith("http://")
+            ? product.image
+            : `${SERVER_URL}/uploads/products/${product.image}`
+        }
+        alt={product.name}
+        onError={(event) => {
+          event.currentTarget.style.display = "none";
+        }}
+        className="h-72 w-72 rounded-xl border object-cover"
+      />
+    ) : (
+      <div className="flex h-72 w-72 items-center justify-center rounded-xl bg-gray-200">
+        No Image
+      </div>
+    )}
+  </div>
 
           <div className="space-y-4">
             <h2 className="text-3xl font-bold">

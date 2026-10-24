@@ -356,19 +356,27 @@ export default function Products() {
                       {index + 1}
                     </td>
 
-                    <td className="px-4 py-4">
-                      {product.image ? (
-                        <img
-                          src={`${SERVER_URL}/uploads/products/${product.image}`}
-                          alt={product.name}
-                          className="mx-auto h-14 w-14 rounded-xl border border-white/10 object-cover"
-                        />
-                      ) : (
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-slate-600">
-                          <Package size={22} />
-                        </div>
-                      )}
-                    </td>
+                  <td className="px-4 py-4">
+  {product.image ? (
+    <img
+      src={
+        product.image.startsWith("https://") ||
+        product.image.startsWith("http://")
+          ? product.image
+          : `${SERVER_URL}/uploads/products/${product.image}`
+      }
+      alt={product.name}
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+      className="mx-auto h-14 w-14 rounded-xl border border-white/10 object-cover"
+    />
+  ) : (
+    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-slate-600">
+      <Package size={22} />
+    </div>
+  )}
+</td>
 
                     <td className="max-w-[200px] px-4 py-4">
                       <p className="truncate font-semibold text-white">

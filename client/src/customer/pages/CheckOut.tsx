@@ -448,19 +448,26 @@ export default function Checkout() {
                             key={item.id}
                             className="flex items-center gap-3"
                           >
-                            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30">
-                              <img
-                                src={`${SERVER_URL}/uploads/products/${item.image}`}
-                                alt={item.name}
-                                className="h-full w-full object-contain p-1"
-                                onError={(event) => {
-                                  event.currentTarget.style.display = "none";
-                                }}
-                              />
-                              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-bold text-white">
-                                {item.quantity}
-                              </span>
-                            </div>
+                           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/30">
+  <img
+    src={
+      item.image?.startsWith("https://") ||
+      item.image?.startsWith("http://")
+        ? item.image
+        : item.image
+          ? `${SERVER_URL}/uploads/products/${item.image}`
+          : undefined
+    }
+    alt={item.name}
+    className="h-full w-full object-contain p-1"
+    onError={(event) => {
+      event.currentTarget.style.display = "none";
+    }}
+  />
+  <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-bold text-white">
+    {item.quantity}
+  </span>
+</div>
 
                             <div className="min-w-0 flex-1">
                               <p className="break-words text-sm font-semibold text-gray-100">

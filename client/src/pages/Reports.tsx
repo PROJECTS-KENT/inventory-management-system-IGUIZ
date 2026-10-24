@@ -657,23 +657,28 @@ export default function Reports() {
                           {index + 1}
                         </td>
 
-                        <td className="px-4 py-3">
-                          <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
-                            {product.image ? (
-                              <img
-                                src={`${SERVER_URL}/uploads/products/${product.image}`}
-                                alt={product.name}
-                                loading="lazy"
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <ImageIcon
-                                size={19}
-                                className="text-slate-600"
-                              />
-                            )}
-                          </div>
-                        </td>
+                       <td className="px-4 py-3">
+  <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+    {product.image ? (
+      <img
+        src={
+          product.image.startsWith("https://") ||
+          product.image.startsWith("http://")
+            ? product.image
+            : `${SERVER_URL}/uploads/products/${product.image}`
+        }
+        alt={product.name}
+        loading="lazy"
+        onError={(event) => {
+          event.currentTarget.style.display = "none";
+        }}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <ImageIcon size={19} className="text-slate-600" />
+    )}
+  </div>
+</td>
 
                         <td className="px-4 py-4">
                           <span className="font-semibold text-slate-200">
