@@ -52,8 +52,8 @@ router.post(
   authenticate,
   authorize("ADMIN"),
   imageUpload.single("image"),
-uploadProductImage,
-create
+  uploadProductImage,
+  create
 );
 
 // Import Excel
@@ -71,6 +71,7 @@ router.put(
   authenticate,
   authorize("ADMIN"),
   imageUpload.single("image"),
+  uploadProductImage,
   update
 );
 

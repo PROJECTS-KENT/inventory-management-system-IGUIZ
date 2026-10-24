@@ -34,7 +34,7 @@ export const uploadProductImage = (
 
   const stream = cloudinary.uploader.upload_stream(
     {
-      folder: "keyverse/products",
+      folder: "keyverse",
       resource_type: "image",
     },
     (error, result) => {
