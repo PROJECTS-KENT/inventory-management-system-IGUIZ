@@ -57,7 +57,7 @@ export const create: RequestHandler = async (req, res) => {
       ...req.body,
       price: Number(req.body.price),
       quantity: Number(req.body.quantity),
-      image: req.file?.filename,
+      image: req.file?.path,
     });
 
     await logActivity(
@@ -182,8 +182,8 @@ export const update: RequestHandler = async (req, res) => {
     };
 
     if (req.file) {
-      data.image = req.file.filename;
-    }
+  data.image = req.file.path;
+}
 
     const product = await updateProduct(id, data);
 
