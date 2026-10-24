@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
-
+import imageUpload, { uploadProductImage,
+} from "../middleware/productUpload";
 import excelUpload from "../middleware/upload";
-import imageUpload from "../middleware/productUpload";
 
 import {
   create,
@@ -52,7 +52,8 @@ router.post(
   authenticate,
   authorize("ADMIN"),
   imageUpload.single("image"),
-  create
+uploadProductImage,
+create
 );
 
 // Import Excel
