@@ -9,7 +9,6 @@ const googleCallbackURL =
   process.env.GOOGLE_CALLBACK_URL ||
   "https://keyverse-api-80o8.onrender.com/api/customer/auth/google/callback";
 
-// Only enable Google login when both credentials are configured.
 if (googleClientID && googleClientSecret) {
   passport.use(
     new GoogleStrategy(
@@ -20,12 +19,31 @@ if (googleClientID && googleClientSecret) {
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {
-          const email = profile.emails?.[0]?.value;
+          const emailEntry = profile.emails?.[0];
+          const email = emailEntry?.value?.trim().toLowerCase();
 
-          if (!email) {
-            return done(new Error("Google account did not provide an email"));
+          if (!email || emailEntry?.verified === false) {
+            return done(null, false);
           }
 
+          // Existing admin accounts only; Google cannot create admins.
+          const admin = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (admin) {
+            if (!admin.isActive || admin.role !== "ADMIN") {
+              return done(null, false);
+            }
+
+            return done(null, {
+              id: admin.id,
+              role: admin.role,
+              accountType: "ADMIN",
+            });
+          }
+
+          // Otherwise, sign in or create a customer.
           let customer = await prisma.customer.findUnique({
             where: { email },
           });
@@ -38,9 +56,19 @@ if (googleClientID && googleClientSecret) {
                 googleId: profile.id,
               },
             });
+          } else if (!customer.googleId) {
+            customer = await prisma.customer.update({
+              where: { id: customer.id },
+              data: { googleId: profile.id },
+            });
+          } else if (customer.googleId !== profile.id) {
+            return done(null, false);
           }
 
-          return done(null, customer);
+          return done(null, {
+            id: customer.id,
+            accountType: "CUSTOMER",
+          });
         } catch (err) {
           return done(err as Error);
         }
@@ -54,21 +82,5 @@ if (googleClientID && googleClientSecret) {
     "Google OAuth is disabled because its credentials are not configured."
   );
 }
-
-passport.serializeUser((user: Express.User, done) => {
-  done(null, (user as Express.User & { id: string }).id);
-});
-
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const customer = await prisma.customer.findUnique({
-      where: { id },
-    });
-
-    done(null, customer || false);
-  } catch (err) {
-    done(err);
-  }
-});
 
 export default passport;

@@ -1,54 +1,11 @@
 
-import { useState } from "react";
-import api from "../api/axios";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+import { googleLogin } from "../services/customerAuth";
 
 const LOGIN_BACKGROUND =
   "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1600&auto=format&fit=crop&q=85";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
-
-      const user = res.data.user;
-
-      if (user?.role !== "ADMIN") {
-        toast.error("This account is not authorized for admin access.");
-        return;
-      }
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("role", user.role);
-      localStorage.setItem("name", user.name);
-
-      toast.success("Admin login successful!");
-      navigate("/dashboard");
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Login failed.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const inputClasses =
-    "w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/20";
-
   return (
     <div
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 bg-cover bg-center px-4 py-10 text-white"
@@ -64,37 +21,17 @@ export default function Login() {
         `,
       }}
     >
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-violet-600/20 blur-[130px]" />
-        <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-blue-500/20 blur-[130px]" />
-        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/10 blur-[120px]" />
-      </div>
-
-      {/* Back to store */}
       <Link
         to="/store"
-        className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-slate-300 backdrop-blur-xl transition hover:border-violet-400/40 hover:text-white sm:left-8 sm:top-8"
+        className="absolute left-5 top-5 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-300 transition hover:text-white sm:left-8 sm:top-8"
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          className="h-4 w-4"
-          aria-hidden="true"
-        >
-          <path d="m15 18-6-6 6-6" />
-          <path d="M9 12h12" />
-        </svg>
-        Back to Store
+        ← Back to Store
       </Link>
 
       <main className="relative z-10 w-full max-w-md">
-        {/* KEYVERSE branding */}
         <div className="mb-8 text-center">
-          <Link to="/store" className="group inline-flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 shadow-xl shadow-violet-500/25 transition group-hover:scale-105">
+          <Link to="/store" className="inline-flex items-center gap-3">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 shadow-xl shadow-violet-500/25">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -109,7 +46,7 @@ export default function Login() {
             </div>
 
             <div className="text-left">
-              <span className="block text-2xl font-black tracking-tight">
+              <span className="block text-2xl font-black">
                 KEY<span className="text-violet-400">VERSE</span>
               </span>
               <span className="block text-[10px] uppercase tracking-[0.3em] text-slate-400">
@@ -119,7 +56,6 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* Admin login card */}
         <div className="rounded-3xl border border-white/10 bg-slate-900/65 p-6 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-9">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10">
@@ -137,130 +73,40 @@ export default function Login() {
             </div>
 
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-violet-400">
-              Administrator Access
+              Secure Access
             </p>
 
-            <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-              Admin <span className="text-violet-400">Login</span>
+            <h1 className="text-3xl font-black sm:text-4xl">
+              Sign in to <span className="text-violet-400">KEYVERSE</span>
             </h1>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Sign in to manage your inventory and orders.
+              Continue with Google to access your account.
             </p>
           </div>
 
-          <form onSubmit={handleLogin}>
-            <div className="mb-5">
-              <label
-                htmlFor="admin-email"
-                className="mb-2 block text-sm font-semibold text-slate-200"
-              >
-                Email Address
-              </label>
-
-              <div className="relative">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
-                  aria-hidden="true"
-                >
-                  <rect x="3" y="5" width="18" height="14" rx="2" />
-                  <path d="m3 7 9 6 9-6" />
-                </svg>
-
-                <input
-                  id="admin-email"
-                  type="email"
-                  placeholder="Admin email"
-                  autoComplete="username"
-                  required
-                  className={`${inputClasses} pl-12`}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="mb-7">
-              <label
-                htmlFor="admin-password"
-                className="mb-2 block text-sm font-semibold text-slate-200"
-              >
-                Password
-              </label>
-
-              <div className="relative">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
-                  aria-hidden="true"
-                >
-                  <rect x="4" y="10" width="16" height="11" rx="2" />
-                  <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-                  <path d="M12 14v3" />
-                </svg>
-
-                <input
-                  id="admin-password"
-                  type="password"
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  required
-                  className={`${inputClasses} pl-12`}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 py-3.5 text-sm font-bold text-white shadow-xl shadow-violet-950/30 transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign in as Admin
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12h14m-6-6 6 6-6 6" />
-                  </svg>
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
+          <button
+            type="button"
+            onClick={googleLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-sm font-bold text-slate-800 shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-100"
+          >
             <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              className="h-4 w-4 text-violet-400"
+              viewBox="0 0 48 48"
+              className="h-5 w-5"
               aria-hidden="true"
             >
-              <rect x="4" y="10" width="16" height="11" rx="2" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 3.12 13.22l7.98 6.19C13 13.72 18.1 9.5 24 9.5Z" />
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.05 46.98 31.9 46.98 24.55Z" />
+              <path fill="#FBBC05" d="M11.1 28.59A14.4 14.4 0 0 1 10.34 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.86.92 7.52 3.12 10.78l7.98-6.19Z" />
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.9 2.3-8.18 2.3-5.9 0-11-4.22-12.9-9.91l-7.98 6.19C6.51 43.62 14.62 48 24 48Z" />
             </svg>
-            Authorized administrators only
-          </div>
+            Continue with Google
+          </button>
+
+          <p className="mt-6 text-center text-xs leading-5 text-slate-400">
+            Administrators will be directed to the admin dashboard.
+            Customers will be directed to the store.
+          </p>
         </div>
 
         <p className="mt-7 text-center text-xs tracking-wide text-slate-500">
