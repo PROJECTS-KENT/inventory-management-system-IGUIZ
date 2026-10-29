@@ -1,8 +1,8 @@
-﻿
-import { useState } from "react";
+﻿import { useState } from "react";
 import api from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../services/api";
 
 const LOGIN_BACKGROUND =
   "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1600&auto=format&fit=crop&q=85";
@@ -36,7 +36,7 @@ export default function Login() {
       localStorage.setItem("role", user.role);
       localStorage.setItem("name", user.name);
 
-      toast.success("Admin login successful!");
+      toast.success("Login successful!");
       navigate("/dashboard");
     } catch (err: any) {
       console.error(err);
@@ -44,6 +44,10 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleGoogleLogin() {
+    window.location.href = `${API_BASE_URL}/customer/auth/google`;
   }
 
   const inputClasses =
@@ -64,7 +68,7 @@ export default function Login() {
         `,
       }}
     >
-      {/* Ambient background glow */}
+      {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-violet-600/20 blur-[130px]" />
         <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-blue-500/20 blur-[130px]" />
@@ -119,7 +123,7 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* Admin login card */}
+        {/* Unified login card */}
         <div className="rounded-3xl border border-white/10 bg-slate-900/65 p-6 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-9">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10">
@@ -137,25 +141,27 @@ export default function Login() {
             </div>
 
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-violet-400">
-              Administrator Access
+              Welcome to KEYVERSE
             </p>
 
             <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-              Admin <span className="text-violet-400">Login</span>
+              Sign in to{" "}
+              <span className="text-violet-400">KEYVERSE</span>
             </h1>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Sign in to manage your inventory and orders.
+              Sign in to manage your account or explore our store.
             </p>
           </div>
 
+          {/* Admin email/password login */}
           <form onSubmit={handleLogin}>
             <div className="mb-5">
               <label
                 htmlFor="admin-email"
                 className="mb-2 block text-sm font-semibold text-slate-200"
               >
-                Email Address
+                Username
               </label>
 
               <div className="relative">
@@ -174,7 +180,7 @@ export default function Login() {
                 <input
                   id="admin-email"
                   type="email"
-                  placeholder="Admin email"
+                  placeholder="Enter your admin email"
                   autoComplete="username"
                   required
                   className={`${inputClasses} pl-12`}
@@ -231,7 +237,7 @@ export default function Login() {
                 </>
               ) : (
                 <>
-                  Sign in as Admin
+                  Sign In
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -247,6 +253,44 @@ export default function Login() {
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs font-medium text-slate-500">OR</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          {/* Customer Google sign-in */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/15 bg-white py-3.5 text-sm font-bold text-slate-900 transition hover:bg-slate-100"
+          >
+            <svg
+              viewBox="0 0 48 48"
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path
+                fill="#4285F4"
+                d="M43.6 24.5c0-1.5-.1-3-.4-4.4H24v8.3h11a9.4 9.4 0 0 1-4.1 6.2v5.2h6.7c3.9-3.6 6-8.9 6-15.3Z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.2c-1.8 1.2-4 2-6.8 2-5.2 0-9.6-3.5-11.2-8.2H5.9v5.4A20 20 0 0 0 24 44Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M12.8 27.7a12 12 0 0 1 0-7.4v-5.4H5.9a20 20 0 0 0 0 18.2l6.9-5.4Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.9 14.9l6.9 5.4c1.6-4.7 6-8.2 11.2-8.2Z"
+              />
+            </svg>
+            Continue with Google
+          </button>
+
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
             <svg
               viewBox="0 0 24 24"
@@ -259,12 +303,12 @@ export default function Login() {
               <rect x="4" y="10" width="16" height="11" rx="2" />
               <path d="M8 10V7a4 4 0 0 1 8 0v3" />
             </svg>
-            Authorized administrators only
+            Admins use email and password. Customers use Google.
           </div>
         </div>
 
         <p className="mt-7 text-center text-xs tracking-wide text-slate-500">
-          KEYVERSE <span className="mx-1 text-violet-500">Γ£ª</span>
+          KEYVERSE <span className="mx-1 text-violet-500">•</span>
           Find your feel. Build your setup.
         </p>
       </main>
