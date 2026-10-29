@@ -35,12 +35,9 @@ router.get(
       process.env.CLIENT_URL || "http://localhost:5173"
     ).replace(/\/$/, "");
 
+    // Admin accounts must use email and password.
     if (account.accountType === "ADMIN") {
-      const token = generateToken(account.id, account.role);
-
-      res.redirect(
-        `${clientUrl}/auth/success?token=${encodeURIComponent(token)}&type=ADMIN`
-      );
+      res.redirect(`${clientUrl}/login?error=google_admin_not_allowed`);
       return;
     }
 
@@ -51,5 +48,4 @@ router.get(
     );
   }
 );
-
 export default router;
