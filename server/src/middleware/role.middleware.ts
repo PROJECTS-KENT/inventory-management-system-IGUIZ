@@ -6,8 +6,6 @@ export function authorize(...roles: string[]): RequestHandler {
   return (req, res, next): void => {
     const authReq = req as AuthRequest;
 
-    console.log("Decoded user:", authReq.user);
-    console.log("Allowed roles:", roles);
 
     if (!authReq.user) {
       res.status(401).json({

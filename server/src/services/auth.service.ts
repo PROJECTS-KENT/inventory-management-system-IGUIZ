@@ -22,6 +22,10 @@ export async function loginUser(email: string, password: string) {
     );
   }
 
+  if (user.role !== "ADMIN") {
+  throw new Error("Invalid email or password");
+}
+
   const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) {
