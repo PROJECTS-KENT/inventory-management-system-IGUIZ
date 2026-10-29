@@ -140,83 +140,65 @@ export default function Store() {
           </Link>
 
           <nav className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {isSignedIn ? (
-              <>
-                <button
-                  onClick={() => navigate("/customer/profile")}
-                  className="rounded-xl border border-white/10 px-3 py-2.5 text-sm font-medium text-slate-200 transition hover:border-violet-400/50 hover:bg-white/5 sm:px-4"
-                >
-                  My Account
-                </button>
+  {isSignedIn ? (
+    <>
+      <button
+        onClick={() => navigate("/customer/profile")}
+        className="rounded-xl border border-white/10 px-3 py-2.5 text-sm font-medium text-slate-200 transition hover:border-violet-400/50 hover:bg-white/5 sm:px-4"
+      >
+        My Account
+      </button>
 
-                <button
-                  onClick={logout}
-                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-red-500/10 hover:text-red-300 sm:px-4"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => {
-                  localStorage.setItem("redirectAfterLogin", "/store");
-                  window.location.href = `${API_BASE_URL}/customer/auth/google`;
-                }}
-                className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-3 py-2.5 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/20 sm:px-4"
-              >
-                Sign In with Google
-              </button>
-            )}
+      <button
+        onClick={logout}
+        className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-red-500/10 hover:text-red-300 sm:px-4"
+      >
+        Sign Out
+      </button>
+    </>
+  ) : (
+    <Link
+      to="/login"
+      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 transition hover:-translate-y-0.5 hover:brightness-110"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+        <path d="m10 17 5-5-5-5" />
+        <path d="M15 12H3" />
+      </svg>
+      Sign In
+    </Link>
+  )}
 
-            <Link
-              to="/login"
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-violet-400/30 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold text-slate-200 backdrop-blur-xl transition hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white sm:px-4 sm:text-sm"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="h-4 w-4 text-violet-300"
-                aria-hidden="true"
-              >
-                <path
-                  d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="m9 12 2 2 4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>Sign in as Admin</span>
-            </Link>
-
-            <Link
-              to="/cart"
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-bold shadow-lg shadow-violet-900/30 transition hover:-translate-y-0.5 hover:shadow-violet-500/20"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className="h-5 w-5"
-                aria-hidden="true"
-              >
-                <path d="M3 3h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 8H6" />
-                <circle cx="10" cy="20" r="1" />
-                <circle cx="18" cy="20" r="1" />
-              </svg>
-              Cart
-              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs">
-                {cart.length}
-              </span>
-            </Link>
-          </nav>
+  <Link
+    to="/cart"
+    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-bold shadow-lg shadow-violet-900/30 transition hover:-translate-y-0.5 hover:shadow-violet-500/20"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M3 3h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 8H6" />
+      <circle cx="10" cy="20" r="1" />
+      <circle cx="18" cy="20" r="1" />
+    </svg>
+    Cart
+    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs">
+      {cart.length}
+    </span>
+  </Link>
+</nav>
         </div>
       </header>
 
