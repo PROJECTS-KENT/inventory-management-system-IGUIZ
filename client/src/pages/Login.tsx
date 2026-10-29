@@ -180,7 +180,7 @@ export default function Login() {
                 <input
                   id="admin-email"
                   type="email"
-                  placeholder="Enter your admin email"
+                  placeholder="Enter Username"
                   autoComplete="username"
                   required
                   className={`${inputClasses} pl-12`}
